@@ -1,0 +1,12 @@
+.App {
+  text-align: center;
+}
+
+input {
+  margin: 5px;
+}
+
+canvas {
+  border: 1px solid black;
+  margin-top: 20px;
+}
