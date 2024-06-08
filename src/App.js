@@ -4,6 +4,7 @@ import "./App.css";
 function App() {
   const [segment1, setSegment1] = useState({ x1: "", y1: "", x2: "", y2: "" });
   const [segment2, setSegment2] = useState({ x1: "", y1: "", x2: "", y2: "" });
+  const [warning, setWarning] = useState(false);
   const [result, setResult] = useState(null);
   const canvasRef = useRef(null);
 
@@ -17,6 +18,14 @@ function App() {
   };
 
   const findIntersection = () => {
+    if (
+      Object.values(segment1).some((value) => value === "") ||
+      Object.values(segment2).some((value) => value === "")
+    ) {
+      setWarning(true);
+      return;
+    }
+    setWarning(false);
     const x1 = parseFloat(segment1.x1);
     const y1 = parseFloat(segment1.y1);
     const x2 = parseFloat(segment1.x2);
@@ -89,7 +98,7 @@ function App() {
     const getManipulator = (start, end) => {
       const range = Math.round(Math.abs(start - end + 1));
       const count = range.toString().length;
-      return Math.pow(5, count - 1);
+      return Math.pow(10, count - 1);
     };
 
     const canvas = canvasRef.current;
@@ -99,7 +108,6 @@ function App() {
     const padding = 15; // Odstęp wokół płótna
     const manipulatorX = getManipulator(startHorizontal, endHorizontal); // Manipulator dla osi x
     const manipulatorY = getManipulator(startVertical, endVertical); // Manipulator dla osi y
-    console.log(manipulatorX, manipulatorY);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -324,8 +332,10 @@ function App() {
             </div>
           </div>
         </div>
-
-        <button onClick={findIntersection}>Znajdź przecięcie</button>
+        <div>
+          <button onClick={findIntersection}>Znajdź przecięcie</button>
+          {warning && <p>Uzupełnij wszystkie wartości!</p>}
+        </div>
       </div>
       <div className="CanvasSection">
         <canvas
