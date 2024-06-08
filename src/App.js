@@ -148,7 +148,7 @@ function App() {
     const centerMargin = Number(canvas.width) / 2;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Pobierz wszystkie punkty
+    // Pobierz wszystkie punkty segmentów
     const points = [
       { x: Number(segment1.x1), y: Number(segment1.y1) },
       { x: Number(segment1.x2), y: Number(segment1.y2) },
@@ -190,6 +190,7 @@ function App() {
       return { x: newX, y: newY };
     };
 
+    // Narysuj siatkę na płótnie
     drawGridLines(minY, maxY, minX, maxX);
 
     // Narysuj pierwszy segment
@@ -224,6 +225,7 @@ function App() {
       ctx.fill();
     }
 
+    // Narysuj nakładający się segment, jeśli istnieje
     if (overlapCoords !== undefined) {
       ctx.beginPath();
       start = transform(
