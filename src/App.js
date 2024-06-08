@@ -89,7 +89,7 @@ function App() {
     const getManipulator = (start, end) => {
       const range = Math.round(Math.abs(start - end + 1));
       const count = range.toString().length;
-      return Math.pow(10, count - 1);
+      return Math.pow(5, count - 1);
     };
 
     const canvas = canvasRef.current;
@@ -99,6 +99,7 @@ function App() {
     const padding = 15; // Odstęp wokół płótna
     const manipulatorX = getManipulator(startHorizontal, endHorizontal); // Manipulator dla osi x
     const manipulatorY = getManipulator(startVertical, endVertical); // Manipulator dla osi y
+    console.log(manipulatorX, manipulatorY);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -125,7 +126,7 @@ function App() {
       // Etykiety linii poziomych
       ctx.fillStyle = "black";
       ctx.textAlign = "right";
-      ctx.fillText(i, padding - 2, y + 5); // Etykieta po lewej stronie linii
+      ctx.fillText(i, padding + manipulatorX / 10, y + 5); // Etykieta po lewej stronie linii
     }
 
     // Narysuj linie pionowe i etykiety
@@ -247,70 +248,93 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Zbiór punktów przecięcia dwóch odcinków</h1>
       <div>
-        <h2>Odcinek 1</h2>
-        <input
-          type="number"
-          placeholder="x1"
-          value={segment1.x1}
-          onChange={(e) => handleInputChange(e, 1, "x1")}
-        />
-        <input
-          type="number"
-          placeholder="y1"
-          value={segment1.y1}
-          onChange={(e) => handleInputChange(e, 1, "y1")}
-        />
-        <input
-          type="number"
-          placeholder="x2"
-          value={segment1.x2}
-          onChange={(e) => handleInputChange(e, 1, "x2")}
-        />
-        <input
-          type="number"
-          placeholder="y2"
-          value={segment1.y2}
-          onChange={(e) => handleInputChange(e, 1, "y2")}
-        />
-      </div>
-      <div>
-        <h2>Odcinek 2</h2>
-        <input
-          type="number"
-          placeholder="x1"
-          value={segment2.x1}
-          onChange={(e) => handleInputChange(e, 2, "x1")}
-        />
-        <input
-          type="number"
-          placeholder="y1"
-          value={segment2.y1}
-          onChange={(e) => handleInputChange(e, 2, "y1")}
-        />
-        <input
-          type="number"
-          placeholder="x2"
-          value={segment2.x2}
-          onChange={(e) => handleInputChange(e, 2, "x2")}
-        />
-        <input
-          type="number"
-          placeholder="y2"
-          value={segment2.y2}
-          onChange={(e) => handleInputChange(e, 2, "y2")}
-        />
-      </div>
-      <div>
+        <h1>Przecięcie dwóch odcinków</h1>
+        <div>
+          <h2>Odcinek 1</h2>
+          <div className="PointsGroup">
+            <div className="InputGroup">
+              <input
+                className="InputBlue"
+                type="number"
+                placeholder="x1"
+                value={segment1.x1}
+                onChange={(e) => handleInputChange(e, 1, "x1")}
+              />
+              <input
+                className="InputBlue"
+                type="number"
+                placeholder="y1"
+                value={segment1.y1}
+                onChange={(e) => handleInputChange(e, 1, "y1")}
+              />
+            </div>
+            <div className="InputGroup">
+              <input
+                className="InputBlue"
+                type="number"
+                placeholder="x2"
+                value={segment1.x2}
+                onChange={(e) => handleInputChange(e, 1, "x2")}
+              />
+              <input
+                className="InputBlue"
+                type="number"
+                placeholder="y2"
+                value={segment1.y2}
+                onChange={(e) => handleInputChange(e, 1, "y2")}
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2>Odcinek 2</h2>
+          <div className="PointsGroup">
+            <div className="InputGroup">
+              <input
+                className="InputRed"
+                type="number"
+                placeholder="x1"
+                value={segment2.x1}
+                onChange={(e) => handleInputChange(e, 2, "x1")}
+              />
+              <input
+                className="InputRed"
+                type="number"
+                placeholder="y1"
+                value={segment2.y1}
+                onChange={(e) => handleInputChange(e, 2, "y1")}
+              />
+            </div>
+            <div className="InputGroup">
+              <input
+                className="InputRed"
+                type="number"
+                placeholder="x2"
+                value={segment2.x2}
+                onChange={(e) => handleInputChange(e, 2, "x2")}
+              />
+              <input
+                className="InputRed"
+                type="number"
+                placeholder="y2"
+                value={segment2.y2}
+                onChange={(e) => handleInputChange(e, 2, "y2")}
+              />
+            </div>
+          </div>
+        </div>
+
         <button onClick={findIntersection}>Znajdź przecięcie</button>
-        {result && <div>{result}</div>}
+      </div>
+      <div className="CanvasSection">
         <canvas
           ref={canvasRef}
           width={500}
           height={500}
           className="canvas"
         ></canvas>
+        {result && <div>{result}</div>}
       </div>
     </div>
   );
