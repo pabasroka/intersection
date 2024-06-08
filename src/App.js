@@ -106,11 +106,21 @@ function App() {
     const scaleX = (canvasWidth - padding) / (maxX - minX);
     const scaleY = (canvasHeight - padding) / (maxY - minY);
 
-    // Apply scaling and translation to center the content
-    const transform = (x, y) => ({
-      x: (x - minX) * scaleX + padding / 2,
-      y: (y - minY) * scaleY + padding / 2,
-    });
+    // Function to transform coordinates
+    const transform = (x, y) => {
+      let newX, newY;
+      if (minX === maxX) {
+        newX = centerMargin;
+      } else {
+        newX = (x - minX) * scaleX + padding / 2;
+      }
+      if (minY === maxY) {
+        newY = canvasHeight / 2;
+      } else {
+        newY = canvasHeight - ((y - minY) * scaleY + padding / 2);
+      }
+      return { x: newX, y: newY };
+    };
 
     // Draw the first segment
     ctx.beginPath();
