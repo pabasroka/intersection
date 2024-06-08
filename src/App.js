@@ -38,14 +38,19 @@ function App() {
         const overlapStartY = Math.max(Math.min(y1, y2), Math.min(y3, y4));
         const overlapEndY = Math.min(Math.max(y1, y2), Math.max(y3, y4));
 
+        const overlapCoords = {
+          startX: overlapStartX.toFixed(2),
+          startY: overlapStartY.toFixed(2),
+          endX: overlapEndX.toFixed(2),
+          endY: overlapEndY.toFixed(2),
+        };
+
         if (overlapStartX < overlapEndX || overlapStartY < overlapEndY) {
           setResult(
-            `Odcinki nakładają się od punktu (${overlapStartX.toFixed(
-              2
-            )}, ${overlapStartY.toFixed(2)}) do punktu (${overlapEndX.toFixed(
-              2
-            )}, ${overlapEndY.toFixed(2)})`
+            `Odcinki nakładają się od punktu (${overlapCoords.startX}, ${overlapCoords.startY}) do punktu (${overlapCoords.endX}, ${overlapCoords.endY})`
           );
+          drawSegments(undefined, undefined, overlapCoords);
+          return;
         } else {
           setResult("Odcinki są równoległe, ale się nie nakładają");
         }
@@ -74,7 +79,7 @@ function App() {
     }
   };
 
-  const drawSegments = (intersectionX, intersectionY) => {
+  const drawSegments = (intersectionX, intersectionY, overlapCoords) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const centerMargin = Number(canvas.width) / 2;
@@ -152,6 +157,20 @@ function App() {
       ctx.arc(intersection.x, intersection.y, 5, 0, 2 * Math.PI);
       ctx.fillStyle = "green";
       ctx.fill();
+    }
+
+    if (overlapCoords !== undefined) {
+      ctx.beginPath();
+      start = transform(
+        Number(overlapCoords.startX),
+        Number(overlapCoords.startY)
+      );
+      end = transform(Number(overlapCoords.endX), Number(overlapCoords.endY));
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.strokeStyle = "green";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
   };
 
