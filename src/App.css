@@ -27,10 +27,17 @@
 
 .InputGroup {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   margin-left: 20px;
   margin-right: 20px;
+}
+
+.Brackets {
+  display: flexbox;
+  flex-direction: column;
+  padding-right: 8px;
+  font-size: 50px;
 }
 
 .PointsGroup
@@ -40,6 +47,13 @@
   justify-content: center;
 }
 
+.InputRed{
+  margin-top: 15px;
+}
+
+.InputBlue{
+  margin-top: 15px;
+}
 input {
   padding: 10px;
   margin: 5px;
@@ -48,6 +62,7 @@ input {
   font-size: 16px;
   outline: none;
   transition: border-color 0.3s;
+  width: 90px;
 }
 
 input:hover {
