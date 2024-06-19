@@ -2,12 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 function App() {
+  // State to manage the coordinates of the first and second segments
   const [segment1, setSegment1] = useState({ x1: "", y1: "", x2: "", y2: "" });
   const [segment2, setSegment2] = useState({ x1: "", y1: "", x2: "", y2: "" });
+  // State to show a warning if inputs are invalid
   const [warning, setWarning] = useState(false);
+  // State to store the result of the intersection calculation
   const [result, setResult] = useState(null);
+  // Reference to the canvas element
   const canvasRef = useRef(null);
+  // Ref for file input element
+  const fileInputRef = useRef(null); 
 
+  // Handles the change in input fields for segment coordinates
   const handleInputChange = (event, segment, key) => {
     const value = event.target.value;
     if (segment === 1) {
@@ -17,7 +24,9 @@ function App() {
     }
   };
 
+  // Function to find the intersection between two segments
   const findIntersection = () => {
+    // Check if any input value is missing
     if (
       Object.values(segment1).some((value) => value === "") ||
       Object.values(segment2).some((value) => value === "")
@@ -26,6 +35,7 @@ function App() {
       return;
     }
     setWarning(false);
+    // Parse the input values to float
     const x1 = parseFloat(segment1.x1);
     const y1 = parseFloat(segment1.y1);
     const x2 = parseFloat(segment1.x2);
@@ -35,13 +45,16 @@ function App() {
     const x4 = parseFloat(segment2.x2);
     const y4 = parseFloat(segment2.y2);
 
+    // Calculate the denominator of the intersection formula
     const denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
+    // Check if segments are parallel
     if (denominator === 0) {
       if (
         (x3 - x1) * (y2 - y1) === (y3 - y1) * (x2 - x1) &&
         (x4 - x1) * (y2 - y1) === (y4 - y1) * (x2 - x1)
       ) {
+        // Calculate the overlapping segment if they are collinear
         const overlapStartX = Math.max(Math.min(x1, x2), Math.min(x3, x4));
         const overlapEndX = Math.min(Math.max(x1, x2), Math.max(x3, x4));
         const overlapStartY = Math.max(Math.min(y1, y2), Math.min(y3, y4));
@@ -53,8 +66,15 @@ function App() {
           endX: overlapEndX.toFixed(2),
           endY: overlapEndY.toFixed(2),
         };
-
-        if (overlapStartX < overlapEndX || overlapStartY < overlapEndY) {
+        // Check if the segments overlap at a single point or along a segment
+        if (overlapStartX === overlapEndX && overlapStartY === overlapEndY) {
+          setResult(
+            `Odcinki przecinają się w punkcie (${overlapCoords.startX}, ${overlapCoords.startY})`
+          );
+          drawSegments(undefined, undefined, overlapCoords);
+          return;
+        }
+        else if (overlapStartX < overlapEndX || overlapStartY < overlapEndY) {
           setResult(
             `Odcinki nakładają się od punktu (${overlapCoords.startX}, ${overlapCoords.startY}) do punktu (${overlapCoords.endX}, ${overlapCoords.endY})`
           );
@@ -70,9 +90,11 @@ function App() {
       return;
     }
 
+    // Calculate the intersection point using the parametric form of the line equations
     const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator;
     const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator;
 
+    // Check if the intersection point lies within both segments
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
       const intersectionX = x1 + t * (x2 - x1);
       const intersectionY = y1 + t * (y2 - y1);
@@ -88,12 +110,15 @@ function App() {
     }
   };
 
+  // Function to draw grid lines on the canvas
   const drawGridLines = (
     startHorizontal,
     endHorizontal,
     startVertical,
     endVertical
   ) => {
+
+    // Helper function to get the scaling factor for grid lines
     const getManipulator = (start, end) => {
       const range = Math.round(Math.abs(start - end + 1));
       const count = range.toString().length;
@@ -122,6 +147,7 @@ function App() {
 
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = lineWidth;
+    // Draw horizontal grid lines
     for (let i = endHorizontal; i >= startHorizontal; i -= manipulatorX) {
       const y = padding + (endHorizontal - i) * horizontalSpacing;
       ctx.beginPath();
@@ -133,6 +159,7 @@ function App() {
       ctx.fillText(i, padding + manipulatorX / 10, y + 5);
     }
 
+    // Draw vertical grid lines
     for (let i = startVertical; i <= endVertical; i += manipulatorY) {
       const x = padding + (i - startVertical) * verticalSpacing;
       ctx.beginPath();
@@ -145,12 +172,15 @@ function App() {
     }
   };
 
+  // Draws segments (lines) on the canvas for both segment1 and segment2,
+  // along with optional visual elements like intersection points or overlapping segments.
   const drawSegments = (intersectionX, intersectionY, overlapCoords) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const centerMargin = Number(canvas.width) / 2;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
 
+    // Array to store all points for scaling calculations
     const points = [
       { x: Number(segment1.x1), y: Number(segment1.y1) },
       { x: Number(segment1.x2), y: Number(segment1.y2) },
@@ -162,6 +192,7 @@ function App() {
       points.push({ x: Number(intersectionX), y: Number(intersectionY) });
     }
 
+    // Find the minimum and maximum coordinates for scaling
     const minX = Math.min(...points.map((p) => p.x));
     const maxX = Math.max(...points.map((p) => p.x));
     const minY = Math.min(...points.map((p) => p.y));
@@ -173,6 +204,9 @@ function App() {
     const scaleX = (canvasWidth - padding) / (maxX - minX);
     const scaleY = (canvasHeight - padding) / (maxY - minY);
 
+    // Transforms the original x and y coordinates to the canvas coordinates
+    // considering scaling and padding. If all x or y values are the same, 
+    // centers the coordinates on the canvas.
     const transform = (x, y) => {
       let newX, newY;
       if (minX === maxX) {
@@ -188,6 +222,7 @@ function App() {
       return { x: newX, y: newY };
     };
 
+    // Draw grid lines before drawing segments
     drawGridLines(minY, maxY, minX, maxX);
 
     ctx.beginPath();
@@ -208,6 +243,7 @@ function App() {
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    // Draw intersection point if defined
     if (intersectionX !== undefined && intersectionY !== undefined) {
       const intersection = transform(
         Number(intersectionX),
@@ -219,6 +255,7 @@ function App() {
       ctx.fill();
     }
 
+    // Draw overlapping segment if overlapCoords are defined
     if (overlapCoords !== undefined) {
       ctx.beginPath();
       start = transform(
@@ -234,6 +271,7 @@ function App() {
     }
   };
 
+  // Generates random coordinates for segment1 and segment2
   const generateCrossingPoints = () => {
     const seg1 = {
       x1: Math.floor(Math.random() * 100),
@@ -248,10 +286,83 @@ function App() {
       y2: Math.floor(Math.random() * 100),
     };
 
+    setWarning(false);
+
+    // Update segment1 and segment2 with new random values
     setSegment1(seg1);
     setSegment2(seg2);
   };
 
+  // Handles file upload: validates content and parse into segments
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const contents = e.target.result;
+
+        if (!isValidFileContents(contents)) {
+          setWarning(true);
+          setSegment1({ x1: "", y1: "", x2: "", y2: "" });
+          setSegment2({ x1: "", y1: "", x2: "", y2: "" });
+          return;
+        }
+
+        const lines = contents.split("\n");
+        if (lines.length >= 2) {
+          const seg1Values = lines[0].split(",").map(val => val.trim());
+          const seg2Values = lines[1].split(",").map(val => val.trim());
+          if (seg1Values.length === 4 && seg2Values.length === 4) {
+            const seg1 = {
+              x1: seg1Values[0],
+              y1: seg1Values[1],
+              x2: seg1Values[2],
+              y2: seg1Values[3],
+            };
+            const seg2 = {
+              x1: seg2Values[0],
+              y1: seg2Values[1],
+              x2: seg2Values[2],
+              y2: seg2Values[3],
+            };
+            setSegment1(seg1);
+            setSegment2(seg2);
+            setWarning(false);
+          } else {
+            setWarning(true);
+          }
+        } else {
+          setWarning(true);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Function to handle click on upload button
+  const handleUploadButtonClick = () => {
+    document.getElementById("fileInput").click(); // Trigger file input click
+  };
+
+  // Function to handle click on "Reset" button
+  const handleFileClear = () => {
+    setSegment1({ x1: "", y1: "", x2: "", y2: "" }); // Clear segments
+    setSegment2({ x1: "", y1: "", x2: "", y2: "" });
+    setWarning(false); // Clear warning
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
+  };
+
+  // Validate for valid characters: numbers, floats, dots, commas, and minuses
+  const isValidFileContents = (contents) => {
+    const regex = /^\d+(,\s*\d+)*(\s*\r?\n\s*\d+(,\s*\d+)*)*$/;
+    return regex.test(contents.trim());
+  };
+
+
+// Redraws the segments and grid lines whenever input values change
   useEffect(() => {
     drawSegments();
   }, [segment1, segment2]);
@@ -264,6 +375,7 @@ function App() {
           <h2>Odcinek 1</h2>
           <div className="PointsGroup">
             <div className="InputGroup">
+            <div className="Brackets">{"{ "}  </div>
               <label>
                 x1:
                 <input
@@ -273,7 +385,8 @@ function App() {
                   value={segment1.x1}
                   onChange={(e) => handleInputChange(e, 1, "x1")}
                 />
-              </label>
+              </label>                
+              <div className="Brackets">, </div>
               <label>
                 y1:
                 <input
@@ -284,8 +397,10 @@ function App() {
                   onChange={(e) => handleInputChange(e, 1, "y1")}
                 />
               </label>
+              <div className="Brackets">{"}"}  </div>
             </div>
             <div className="InputGroup">
+            <div className="Brackets">{"{ "}  </div>
               <label>
                 x2:
                 <input
@@ -296,6 +411,7 @@ function App() {
                   onChange={(e) => handleInputChange(e, 1, "x2")}
                 />
               </label>
+              <div className="Brackets">, </div>
               <label>
                 y2:
                 <input
@@ -306,12 +422,14 @@ function App() {
                   onChange={(e) => handleInputChange(e, 1, "y2")}
                 />
               </label>
+              <div className="Brackets">{"}"}  </div>
             </div>
           </div>
           <div>
             <h2>Odcinek 2</h2>
             <div className="PointsGroup">
               <div className="InputGroup">
+                <div className="Brackets">{"{ "}  </div>
                 <label>
                   x1:
                   <input
@@ -322,6 +440,7 @@ function App() {
                     onChange={(e) => handleInputChange(e, 2, "x1")}
                   />
                 </label>
+                <div className="Brackets">, </div>
                 <label>
                   y1:
                   <input
@@ -332,8 +451,10 @@ function App() {
                     onChange={(e) => handleInputChange(e, 2, "y1")}
                   />
                 </label>
+                <div className="Brackets">{"}"}  </div>
               </div>
               <div className="InputGroup">
+              <div className="Brackets">{"{ "}  </div>
                 <label>
                   x2:
                   <input
@@ -344,6 +465,7 @@ function App() {
                     onChange={(e) => handleInputChange(e, 2, "x2")}
                   />
                 </label>
+                <div className="Brackets">, </div>
                 <label>
                   y2
                   <input
@@ -354,13 +476,27 @@ function App() {
                     onChange={(e) => handleInputChange(e, 2, "y2")}
                   />
                 </label>
+                <div className="Brackets">{"}"}  </div>
               </div>
             </div>
           </div>
           <div className="ButtonSection">
             <button onClick={findIntersection}>Znajdź przecięcie</button>
             <button onClick={generateCrossingPoints}>Generuj losowo</button>
-            {warning && <p>Uzupełnij wszystkie wartości!</p>}
+            <button className="UploadButton" onClick={handleUploadButtonClick}>
+              Załaduj plik
+            </button>
+            <button onClick={handleFileClear}>Reset</button>
+            <input
+              type="file"
+              id="fileInput"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              style={{ display: "none" }}
+            />
+            {warning && (
+              <p>Wprowadzono nieprawidłowe lub niepełne dane lub plik.</p>
+            )}
           </div>
         </div>
         <div className="CanvasSection">
