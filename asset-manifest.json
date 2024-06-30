@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/intersection/static/css/main.db0e4e25.css",
+    "main.js": "/intersection/static/js/main.adbe6845.js",
+    "static/js/453.ab315844.chunk.js": "/intersection/static/js/453.ab315844.chunk.js",
+    "index.html": "/intersection/index.html",
+    "main.db0e4e25.css.map": "/intersection/static/css/main.db0e4e25.css.map",
+    "main.adbe6845.js.map": "/intersection/static/js/main.adbe6845.js.map",
+    "453.ab315844.chunk.js.map": "/intersection/static/js/453.ab315844.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.db0e4e25.css",
+    "static/js/main.adbe6845.js"
+  ]
+}
