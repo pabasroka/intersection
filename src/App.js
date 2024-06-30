@@ -12,7 +12,7 @@ function App() {
   // Reference to the canvas element
   const canvasRef = useRef(null);
   // Ref for file input element
-  const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
 
   // Handles the change in input fields for segment coordinates
   const handleInputChange = (event, segment, key) => {
@@ -73,8 +73,7 @@ function App() {
           );
           drawSegments(undefined, undefined, overlapCoords);
           return;
-        }
-        else if (overlapStartX < overlapEndX || overlapStartY < overlapEndY) {
+        } else if (overlapStartX < overlapEndX || overlapStartY < overlapEndY) {
           setResult(
             `Odcinki nakładają się od punktu (${overlapCoords.startX}, ${overlapCoords.startY}) do punktu (${overlapCoords.endX}, ${overlapCoords.endY})`
           );
@@ -117,7 +116,6 @@ function App() {
     startVertical,
     endVertical
   ) => {
-
     // Helper function to get the scaling factor for grid lines
     const getManipulator = (start, end) => {
       const range = Math.round(Math.abs(start - end + 1));
@@ -178,7 +176,7 @@ function App() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const centerMargin = Number(canvas.width) / 2;
-    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Array to store all points for scaling calculations
     const points = [
@@ -205,7 +203,7 @@ function App() {
     const scaleY = (canvasHeight - padding) / (maxY - minY);
 
     // Transforms the original x and y coordinates to the canvas coordinates
-    // considering scaling and padding. If all x or y values are the same, 
+    // considering scaling and padding. If all x or y values are the same,
     // centers the coordinates on the canvas.
     const transform = (x, y) => {
       let newX, newY;
@@ -310,8 +308,8 @@ function App() {
 
         const lines = contents.split("\n");
         if (lines.length >= 2) {
-          const seg1Values = lines[0].split(",").map(val => val.trim());
-          const seg2Values = lines[1].split(",").map(val => val.trim());
+          const seg1Values = lines[0].split(",").map((val) => val.trim());
+          const seg2Values = lines[1].split(",").map((val) => val.trim());
           if (seg1Values.length === 4 && seg2Values.length === 4) {
             const seg1 = {
               x1: seg1Values[0],
@@ -357,12 +355,12 @@ function App() {
 
   // Validate for valid characters: numbers, floats, dots, commas, and minuses
   const isValidFileContents = (contents) => {
-    const regex = /^\d+(,\s*\d+)*(\s*\r?\n\s*\d+(,\s*\d+)*)*$/;
+    const regex =
+      /^-?\d+(\.\d+)?(\s*,\s*-?\d+(\.\d+)?){3}(\s*\r?\n\s*-?\d+(\.\d+)?(\s*,\s*-?\d+(\.\d+)?){3})*$/;
     return regex.test(contents.trim());
   };
 
-
-// Redraws the segments and grid lines whenever input values change
+  // Redraws the segments and grid lines whenever input values change
   useEffect(() => {
     drawSegments();
   }, [segment1, segment2]);
@@ -375,7 +373,7 @@ function App() {
           <h2>Odcinek 1</h2>
           <div className="PointsGroup">
             <div className="InputGroup">
-            <div className="Brackets">{"{ "}  </div>
+              <div className="Brackets">{"{ "} </div>
               <label>
                 x1:
                 <input
@@ -385,7 +383,7 @@ function App() {
                   value={segment1.x1}
                   onChange={(e) => handleInputChange(e, 1, "x1")}
                 />
-              </label>                
+              </label>
               <div className="Brackets">, </div>
               <label>
                 y1:
@@ -397,10 +395,10 @@ function App() {
                   onChange={(e) => handleInputChange(e, 1, "y1")}
                 />
               </label>
-              <div className="Brackets">{"}"}  </div>
+              <div className="Brackets">{"}"} </div>
             </div>
             <div className="InputGroup">
-            <div className="Brackets">{"{ "}  </div>
+              <div className="Brackets">{"{ "} </div>
               <label>
                 x2:
                 <input
@@ -422,14 +420,14 @@ function App() {
                   onChange={(e) => handleInputChange(e, 1, "y2")}
                 />
               </label>
-              <div className="Brackets">{"}"}  </div>
+              <div className="Brackets">{"}"} </div>
             </div>
           </div>
           <div>
             <h2>Odcinek 2</h2>
             <div className="PointsGroup">
               <div className="InputGroup">
-                <div className="Brackets">{"{ "}  </div>
+                <div className="Brackets">{"{ "} </div>
                 <label>
                   x1:
                   <input
@@ -451,10 +449,10 @@ function App() {
                     onChange={(e) => handleInputChange(e, 2, "y1")}
                   />
                 </label>
-                <div className="Brackets">{"}"}  </div>
+                <div className="Brackets">{"}"} </div>
               </div>
               <div className="InputGroup">
-              <div className="Brackets">{"{ "}  </div>
+                <div className="Brackets">{"{ "} </div>
                 <label>
                   x2:
                   <input
@@ -476,7 +474,7 @@ function App() {
                     onChange={(e) => handleInputChange(e, 2, "y2")}
                   />
                 </label>
-                <div className="Brackets">{"}"}  </div>
+                <div className="Brackets">{"}"} </div>
               </div>
             </div>
           </div>
